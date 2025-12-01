@@ -1,0 +1,124 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+' ===== Core Users =====
+abstract class User {
+  +userId
+  +name
+  +email
+}
+
+class Student {
+  +studentNumber
+}
+
+class Instructor {
+  +employeeId
+}
+
+class Administrator {
+  +adminId
+}
+
+User <|-- Student
+User <|-- Instructor
+User <|-- Administrator
+
+' ===== Course Structure =====
+class Course {
+  +courseId
+  +title
+  +description
+}
+
+class Enrollment {
+  +enrollmentId
+  +status
+}
+
+Student "1" -- "0..*" Enrollment
+Course  "1" -- "0..*" Enrollment
+
+class CourseModule {
+  +moduleId
+  +title
+  +sequenceOrder
+}
+
+Course "1" -- "1..*" CourseModule
+
+class ReferenceMaterial {
+  +materialId
+  +title
+  +type
+  +location
+}
+
+CourseModule "0..*" -- "0..*" ReferenceMaterial
+
+' ===== Assessments (Graded) =====
+class Assessment {
+  +assessmentId
+  +title
+  +type
+  +maxScore
+}
+
+Course "1" -- "0..*" Assessment
+
+class Question {
+  +questionId
+  +text
+}
+
+Assessment "1" -- "1..*" Question
+
+class Attempt {
+  +attemptId
+  +attemptDate
+  +score
+  +isGraded
+}
+
+Student    "1" -- "0..*" Attempt
+Assessment "1" -- "0..*" Attempt
+
+' ===== Concepts & Mastery =====
+class Concept {
+  +conceptId
+  +name
+  +description
+}
+
+Question     "0..*" -- "1..*" Concept : assesses
+CourseModule "0..*" -- "1..*" Concept : teaches
+
+class StudentConceptMastery {
+  +masteryLevel
+  +lastUpdated
+}
+
+Student "1" -- "0..*" StudentConceptMastery
+Concept "1" -- "0..*" StudentConceptMastery
+
+' ===== Adaptive Practice =====
+class PracticeSession {
+  +sessionId
+  +startedOn
+  +status
+}
+
+Student "1" -- "0..*" PracticeSession
+
+class PracticeQuestion {
+  +sequenceNumber
+  +isCorrect
+}
+
+PracticeSession "1" -- "1..*" PracticeQuestion
+PracticeQuestion "1" -- "1" Question
+
+' Reference material may be used in explanations for practice
+Concept         "0..*" -- "0..*" ReferenceMaterial
+
+@enduml

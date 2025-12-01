@@ -1,0 +1,192 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+package "Domain Layer" {
+
+  ' ===== Users =====
+  abstract class User {
+    - userId: String
+    - name: String
+    - email: String
+    + login(email: String, password: String): boolean
+    + logout(): void
+  }
+
+  class Student {
+    - studentNumber: String
+    + requestPractice(course: Course): PracticeSession
+    + viewProgress(course: Course): void
+  }
+
+  class Instructor {
+    - employeeId: String
+    + createAssessment(course: Course, title: String, type: String): Assessment
+    + viewStudentPerformance(student: Student, course: Course): void
+  }
+
+  class Administrator {
+    - adminId: String
+    + createCourse(title: String, description: String): Course
+    + assignInstructor(course: Course, instructor: Instructor): void
+  }
+
+  User <|-- Student
+  User <|-- Instructor
+  User <|-- Administrator
+
+  ' ===== Course & Content =====
+  class Course {
+    - courseId: String
+    - title: String
+    - description: String
+    + addModule(module: CourseModule): void
+    + addAssessment(assessment: Assessment): void
+  }
+
+  class CourseModule {
+    - moduleId: String
+    - title: String
+    - sequenceOrder: int
+    + addReferenceMaterial(ref: ReferenceMaterial): void
+  }
+
+  class ReferenceMaterial {
+    - materialId: String
+    - title: String
+    - type: String
+    - location: String
+  }
+
+  class Enrollment {
+    - enrollmentId: String
+    - status: String
+    + activate(): void
+    + withdraw(): void
+  }
+
+  Student "1" -- "0..*" Enrollment
+  Course  "1" -- "0..*" Enrollment
+
+  Course "1" -- "1..*" CourseModule
+  CourseModule "0..*" -- "0..*" ReferenceMaterial
+
+  ' ===== Assessments (Graded) =====
+  class Assessment {
+    - assessmentId: String
+    - title: String
+    - type: String
+    - maxScore: double
+    + addQuestion(q: Question): void
+  }
+
+  class Question {
+    - questionId: String
+    - text: String
+    - correctAnswer: String
+    + validateAnswer(answer: String): boolean
+  }
+
+  class Attempt {
+    - attemptId: String
+    - attemptDate: Date
+    - score: double
+    - isGraded: boolean
+  }
+
+  Course "1" -- "0..*" Assessment
+  Assessment "1" -- "1..*" Question
+  Student "1" -- "0..*" Attempt
+  Assessment "1" -- "0..*" Attempt
+
+  ' ===== Concepts & Mastery =====
+  class Concept {
+    - conceptId: String
+    - name: String
+    - description: String
+  }
+
+  class StudentConceptMastery {
+    - masteryLevel: double
+    - lastUpdated: Date
+    + updateLevel(newLevel: double): void
+  }
+
+  Question     "0..*" -- "1..*" Concept : assesses >
+  CourseModule "0..*" -- "1..*" Concept : teaches >
+  Student "1" -- "0..*" StudentConceptMastery
+  Concept "1" -- "0..*" StudentConceptMastery
+
+  ' ===== Adaptive Practice =====
+  class PracticeSession {
+    - sessionId: String
+    - startedOn: Date
+    - status: String
+    + addPracticeQuestion(pq: PracticeQuestion): void
+    + calculateScore(): double
+    + hasNext(): boolean
+  }
+
+  class PracticeQuestion {
+    - id: String
+    - givenAnswer: String
+    - isCorrect: boolean
+    + evaluate(): void
+  }
+
+  Student "1" -- "0..*" PracticeSession
+  PracticeSession "1" -- "1..*" PracticeQuestion
+  PracticeQuestion "1" -- "1" Question
+
+}
+
+package "Service Layer" {
+
+  class UserService {
+    + authenticate(email: String, password: String): User
+    + changePassword(user: User, newPassword: String): void
+  }
+
+  class CourseService {
+    + enrollStudent(student: Student, course: Course): Enrollment
+    + getCourseProgress(student: Student, course: Course): double
+  }
+
+  class AssessmentService {
+    + submitAttempt(student: Student, assessment: Assessment): Attempt
+    + calculateScore(attempt: Attempt): double
+  }
+
+  class AdaptivePracticeService {
+    - modelConfig: String
+    + generatePracticeSession(student: Student, course: Course): PracticeSession
+    + submitPracticeAnswer(sessionId: String, questionId: String, answer: String): void
+  }
+
+  class AnalyticsService {
+    + getStudentConceptReport(student: Student): void
+    + getCourseDifficultyReport(course: Course): void
+  }
+
+}
+
+' ===== Service dependencies on Domain =====
+UserService ..> User
+CourseService ..> Student
+CourseService ..> Course
+CourseService ..> Enrollment
+
+AssessmentService ..> Assessment
+AssessmentService ..> Attempt
+AssessmentService ..> Student
+
+AdaptivePracticeService ..> Student
+AdaptivePracticeService ..> Course
+AdaptivePracticeService ..> PracticeSession
+AdaptivePracticeService ..> StudentConceptMastery
+AdaptivePracticeService ..> Concept
+
+AnalyticsService ..> Student
+AnalyticsService ..> Course
+AnalyticsService ..> StudentConceptMastery
+
+@enduml

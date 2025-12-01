@@ -1,0 +1,65 @@
+@startuml
+' Activity Diagram: Student completes adaptive practice session
+
+|Student|
+start
+:Select "Request Practice"\nfor a course;
+
+|Web UI|
+:Send practice request\n(studentId, courseId)\nto AdaptivePracticeService;
+
+|AdaptivePracticeService|
+:Gather course progress\nand assessment history;
+:Identify weak concepts;
+:Request practice questions\nfrom AI Practice Service;
+
+|AI Practice Service|
+:Generate concept-targeted\npractice questions;
+:Return questions and metadata;
+
+|AdaptivePracticeService|
+:Create PracticeSession\nwith generated questions;
+:Return session info and\nfirst question to Web UI;
+
+|Web UI|
+:Display first practice question;
+
+|Student|
+:Read question;
+
+repeat
+  :Submit answer;
+
+  |Web UI|
+  :Forward answer to\nAdaptivePracticeService;
+
+  |AdaptivePracticeService|
+  :Load session and question;
+  :Validate answer and\nupdate PracticeQuestion;
+  :Update concept mastery;
+  :Request explanation and\nreferences from AI;
+
+  |AI Practice Service|
+  :Generate explanation and\nselect references;
+  :Return explanation and references;
+
+  |AdaptivePracticeService|
+  :Update session state;
+  :Determine next step\n(more questions or summary);
+  :Return feedback and either\nnext question or summary\nto Web UI;
+
+  |Web UI|
+  :Display feedback,\nexplanation, and\n(if available) next question;
+
+  |Student|
+  :Review feedback and\nreferences;
+repeat while (More questions?) is (yes)
+
+|Web UI|
+:Display practice session summary\n(score, concept feedback);
+
+|Student|
+:Review summary and\noptionally plan next steps;
+stop
+
+@enduml

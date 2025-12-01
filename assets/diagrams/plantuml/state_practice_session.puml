@@ -1,0 +1,34 @@
+@startuml
+
+state "PracticeSession" as PracticeSession {
+
+  [*] --> Created
+
+  Created : sessionId assigned\nstudent & course linked
+  Created --> GeneratingQuestions : requestPractice()
+  Created --> Cancelled : cancelSession()
+
+  state GeneratingQuestions {
+    [*] --> WaitingForAI
+    WaitingForAI --> Ready : questionsPrepared
+    WaitingForAI --> Failed : generationError
+  }
+
+  Ready : questions stored\nno questions answered yet
+  Ready --> InProgress : firstQuestionDisplayed()
+  Ready --> Expired : timeout
+
+  InProgress : answering questions
+  InProgress --> Paused : pauseRequested
+  Paused --> InProgress : resumeRequested
+
+  InProgress --> Completed : allQuestionsAnswered
+  InProgress --> Expired : inactivityTimeout
+
+  Completed : score calculated\nfeedback updated
+  Expired   : session closed\nwithout completion
+  Cancelled : session cancelled
+  Failed    : AI generation failed
+}
+
+@enduml

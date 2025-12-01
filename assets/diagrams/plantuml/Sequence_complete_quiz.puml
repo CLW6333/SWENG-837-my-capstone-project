@@ -1,0 +1,64 @@
+@startuml
+autonumber
+
+actor Student
+boundary "Web UI" as UI
+control "AdaptivePracticeService" as APS
+database "PracticeSession\nRepository" as PSR
+database "Question\nRepository" as QR
+database "StudentConceptMastery\nRepository" as SCM
+participant "AI Practice Service" as AIS
+
+Student -> UI: Answer practice question\n(sessionId, questionId, answer)
+activate UI
+
+UI -> APS: submitPracticeAnswer(sessionId,\nquestionId, answer)
+activate APS
+
+APS -> PSR: getSession(sessionId)
+activate PSR
+PSR --> APS: practiceSession
+deactivate PSR
+
+APS -> QR: getQuestion(questionId)
+activate QR
+QR --> APS: question
+deactivate QR
+
+APS -> APS: isCorrect = question.validateAnswer(answer)
+APS -> APS: update PracticeQuestion\n(givenAnswer, isCorrect)
+
+APS -> QR: getConceptsForQuestion(questionId)
+activate QR
+QR --> APS: concepts
+deactivate QR
+
+APS -> SCM: updateMastery(studentId, concepts, isCorrect)
+activate SCM
+SCM --> APS: masteryUpdated
+deactivate SCM
+
+APS -> AIS: generateExplanation(questionId,\nanswer, isCorrect)
+activate AIS
+AIS --> APS: explanation,\nreferenceLinks
+deactivate AIS
+
+APS -> PSR: saveSession(practiceSession)
+activate PSR
+PSR --> APS: saved
+deactivate PSR
+
+APS -> APS: hasMoreQuestions = practiceSession.hasNext()
+
+alt More questions remaining
+  APS --> UI: answerResult(isCorrect,\nexplanation, referenceLinks,\nnextQuestion)
+else Session complete
+  APS --> UI: sessionSummary(totalQuestions,\ncorrectCount, conceptFeedback)
+end
+
+deactivate APS
+
+UI --> Student: Display feedback and\nnext question or session summary
+deactivate UI
+
+@enduml

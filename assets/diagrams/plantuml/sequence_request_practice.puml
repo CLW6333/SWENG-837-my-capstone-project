@@ -1,0 +1,51 @@
+@startuml
+autonumber
+
+actor Student
+boundary "Web UI" as UI
+control "AdaptivePracticeService" as APS
+control "CourseService" as CS
+control "AssessmentService" as AS
+database "StudentConceptMastery\nRepository" as SCM
+participant "AI Practice Service" as AIS
+entity "PracticeSession" as PS
+
+Student -> UI: Select "Request Practice"\n(courseId)
+activate UI
+
+UI -> APS: requestPractice(studentId, courseId)
+activate APS
+
+APS -> CS: getCourseProgress(studentId, courseId)
+activate CS
+CS --> APS: courseProgress
+deactivate CS
+
+APS -> AS: getAssessmentHistory(studentId, courseId)
+activate AS
+AS --> APS: assessmentHistory
+deactivate AS
+
+APS -> SCM: getWeakConcepts(studentId, courseId)
+activate SCM
+SCM --> APS: weakConcepts
+deactivate SCM
+
+APS -> AIS: generatePracticeQuestions(weakConcepts)
+activate AIS
+AIS --> APS: practiceQuestionTemplates
+deactivate AIS
+
+APS -> PS: new PracticeSession(studentId, courseId)
+activate PS
+APS -> PS: addPracticeQuestions(practiceQuestionTemplates)
+PS --> APS: sessionCreated
+deactivate PS
+
+APS --> UI: practiceSessionSummary\n(sessionId, questionCount)
+deactivate APS
+
+UI --> Student: Display first practice question
+deactivate UI
+
+@enduml

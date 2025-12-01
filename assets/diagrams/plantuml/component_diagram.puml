@@ -1,0 +1,52 @@
+@startuml
+skinparam componentStyle rectangle
+
+actor "Student" as Student
+actor "Instructor" as Instructor
+actor "Administrator" as Admin
+
+package "Client Layer" {
+  component "Web UI\n(Frontend)" as WebUI
+}
+
+package "Application Layer" {
+  component "Auth & User\nManagement Service" as AuthService
+  component "Course & Content\nService" as CourseService
+  component "Assessment\nService" as AssessService
+  component "Adaptive Practice\nService" as AdaptiveService
+  component "Analytics\nService" as AnalyticsService
+}
+
+package "Data Layer" {
+  database "LMS Database" as LMSDB
+  database "Analytics Database" as AnalyticsDB
+}
+
+package "External Services" {
+  component "AI Practice Service" as AIService
+  component "Email / Notification\nService" as NotifService
+}
+
+Student --> WebUI
+Instructor --> WebUI
+Admin --> WebUI
+
+WebUI --> AuthService : login, logout,\nuser profile
+WebUI --> CourseService : view courses,\nmanage content
+WebUI --> AssessService : graded assessments
+WebUI --> AdaptiveService : request practice,\nsubmit answers
+WebUI --> AnalyticsService : dashboards,\nreports
+
+AuthService --> LMSDB
+CourseService --> LMSDB
+AssessService --> LMSDB
+AdaptiveService --> LMSDB
+AnalyticsService --> LMSDB
+AnalyticsService --> AnalyticsDB
+
+AdaptiveService --> AIService : generate questions\nand explanations
+
+AnalyticsService --> NotifService : alerts, summaries
+CourseService --> NotifService : course announcements
+
+@enduml

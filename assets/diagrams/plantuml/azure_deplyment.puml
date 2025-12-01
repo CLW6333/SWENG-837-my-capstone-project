@@ -1,0 +1,47 @@
+@startuml
+' Azure Cloud Deployment Diagram - Medium Detail (Simplified)
+
+actor "Student" as Student
+actor "Instructor" as Instructor
+actor "Administrator" as Admin
+
+rectangle "Client Browser" as Browser
+
+Student --> Browser
+Instructor --> Browser
+Administrator --> Browser
+
+cloud "Microsoft Azure" {
+
+  rectangle "Azure App Service" as AppService {
+    component "Web App\n(Frontend)" as WebApp
+    component "API App\n(Backend Services)" as ApiApp
+  }
+
+  database "Azure SQL Database\n(LMS DB)" as SqlLms
+  database "Azure SQL Database\n(Analytics DB)" as SqlAnalytics
+
+  rectangle "Azure OpenAI Service\n(AI Practice Service)" as AzureAI
+
+  rectangle "Azure Storage Account\n(Content & Logs)" as Storage
+
+  rectangle "Azure Communication\nServices" as CommSvc
+
+  rectangle "Azure Active Directory\n(Entra ID)" as AAD
+}
+
+Browser --> WebApp : HTTPS
+WebApp --> ApiApp : REST API calls
+
+Browser --> AAD : login (OAuth/OIDC)
+AAD --> WebApp : ID / access token
+
+ApiApp --> SqlLms : read/write\nLMS data
+ApiApp --> SqlAnalytics : write\naggregated analytics
+
+ApiApp --> AzureAI : generate practice\nquestions & explanations
+ApiApp --> Storage : store content,\nmedia, logs
+
+ApiApp --> CommSvc : send\nnotifications
+
+@enduml

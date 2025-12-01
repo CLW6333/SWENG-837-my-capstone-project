@@ -1,0 +1,57 @@
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+skinparam actorStyle awesome
+
+actor "Student" as Student
+actor "Instructor" as Instructor
+actor "Administrator" as Admin
+actor "AI Practice Service" as AIService
+
+rectangle "Online Learning Platform\nwith Adaptive Practice" as System {
+
+  (View Course Content) as UC_ViewContent
+  (Take Graded Assessment) as UC_TakeAssessment
+  (View Grades & Feedback) as UC_ViewGrades
+
+  (Request Adaptive Practice Session) as UC_RequestPractice
+  (Take AI-Generated Practice\nQuiz/Test) as UC_TakePractice
+  (View Explanations & References) as UC_ViewExplanations
+
+  (Manage Course Content\nand Assessments) as UC_ManageContent
+  (View Student Performance\n& Struggles) as UC_ViewPerformance
+  (Review Adaptive Practice\nAnalytics) as UC_ViewAdaptiveAnalytics
+
+  (Manage Users & Roles) as UC_ManageUsers
+  (Manage Courses & Catalog) as UC_ManageCourses
+  (Configure AI & System Settings) as UC_ConfigAI
+
+  (Generate Practice Questions\nand Explanations) as UC_GeneratePractice
+}
+
+' Student interactions
+Student --> UC_ViewContent
+Student --> UC_TakeAssessment
+Student --> UC_ViewGrades
+Student --> UC_RequestPractice
+Student --> UC_TakePractice
+Student --> UC_ViewExplanations
+
+' Instructor interactions
+Instructor --> UC_ManageContent
+Instructor --> UC_ViewPerformance
+Instructor --> UC_ViewAdaptiveAnalytics
+
+' Administrator interactions
+Admin --> UC_ManageUsers
+Admin --> UC_ManageCourses
+Admin --> UC_ConfigAI
+
+' System to external AI service
+UC_TakePractice --> UC_GeneratePractice : <<include>>
+AIService --> UC_GeneratePractice
+
+' Internal relationship
+UC_TakePractice --> UC_ViewExplanations : <<include>>
+
+@enduml
