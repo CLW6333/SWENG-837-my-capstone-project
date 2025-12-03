@@ -1,0 +1,223 @@
+openapi: 3.0.3
+info:
+  title: Online Learning Platform - Adaptive Practice API
+  version: 1.0.0
+  description: >
+    API specification for the Adaptive Practice Service in the Online Learning Platform.
+    This service generates personalized practice sessions and records student performance
+    based on LMS data.
+
+servers:
+  - url: https://api.example.com
+    description: Production server (example placeholder)
+
+paths:
+  /students/{studentId}/courses/{courseId}/practice-sessions:
+    post:
+      summary: Create a new adaptive practice session for a student in a course
+      operationId: createPracticeSession
+      parameters:
+        - name: studentId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: courseId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                targetConceptIds:
+                  type: array
+                  items:
+                    type: string
+                  description: >
+                    Optional list of concept IDs to focus the practice session on.
+      responses:
+        '201':
+          description: Practice session created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PracticeSession'
+        '400':
+          description: Invalid request
+        '404':
+          description: Student or course not found
+
+    get:
+      summary: List practice sessions for a student in a course
+      operationId: listPracticeSessions
+      parameters:
+        - name: studentId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: courseId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [CREATED, READY, IN_PROGRESS, COMPLETED, EXPIRED]
+      responses:
+        '200':
+          description: List of practice sessions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PracticeSession'
+
+  /practice-sessions/{sessionId}:
+    get:
+      summary: Get details of a practice session
+      operationId: getPracticeSession
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Practice session details including questions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PracticeSession'
+        '404':
+          description: Practice session not found
+
+  /practice-sessions/{sessionId}/answers:
+    post:
+      summary: Submit an answer to a practice question
+      operationId: submitPracticeAnswer
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PracticeAnswerSubmission'
+      responses:
+        '200':
+          description: Answer processed and feedback returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PracticeAnswerResult'
+        '400':
+          description: Invalid request
+        '404':
+          description: Practice session or question not found
+        '409':
+          description: Practice session is not in a state that allows answering
+
+components:
+  schemas:
+    PracticeSession:
+      type: object
+      properties:
+        sessionId:
+          type: string
+        studentId:
+          type: string
+        courseId:
+          type: string
+        status:
+          type: string
+          enum: [CREATED, READY, IN_PROGRESS, COMPLETED, EXPIRED]
+        startedOn:
+          type: string
+          format: date-time
+          nullable: true
+        completedOn:
+          type: string
+          format: date-time
+          nullable: true
+        totalQuestions:
+          type: integer
+        correctCount:
+          type: integer
+        questions:
+          type: array
+          items:
+            $ref: '#/components/schemas/PracticeQuestion'
+
+    PracticeQuestion:
+      type: object
+      properties:
+        questionId:
+          type: string
+        practiceSessionId:
+          type: string
+        conceptId:
+          type: string
+        positionIndex:
+          type: integer
+        questionText:
+          type: string
+        correctAnswer:
+          type: string
+          description: The canonical correct answer (not exposed to the student in advance)
+        explanation:
+          type: string
+          description: AI-generated explanation based on instructor-approved content
+        referenceUrl:
+          type: string
+          nullable: true
+          description: Link to relevant lesson or book page
+        studentAnswer:
+          type: string
+          nullable: true
+        isCorrect:
+          type: boolean
+          nullable: true
+
+    PracticeAnswerSubmission:
+      type: object
+      required:
+        - questionId
+        - answerText
+      properties:
+        questionId:
+          type: string
+        answerText:
+          type: string
+
+    PracticeAnswerResult:
+      type: object
+      properties:
+        sessionId:
+          type: string
+        questionId:
+          type: string
+        isCorrect:
+          type: boolean
+        explanation:
+          type: string
+          description: Explanation returned to the student for this question
+        referenceUrl:
+          type: string
+          nullable: true
+        updatedSession:
+          $ref: '#/components/schemas/PracticeSession'
