@@ -1,182 +1,144 @@
 # Online Learning Platform with Adaptive Practice – SWENG 837 Course Project
 
-### Overview
+## Overview
 
+This repository contains the complete software design documentation for an **Online Learning Platform with Adaptive Learning Support**, created as part of the **SWENG 837 – Software System Design** course project.
 
+The system extends traditional LMS platforms by adding AI-generated, personalized practice sessions that target each student's areas of struggle. Using instructor-approved content, the system analyzes a student's performance, identifies weak topics, and generates tailored quiz questions, explanations, and remediation references.
 
-This repository contains the complete software design documentation for an Online Learning Platform with Adaptive Learning Support, created as part of the SWENG 837 – Software System Design course project.
+This repository includes:
 
+- Problem Statement, Business Requirements, and Non-Functional Requirements  
+- Full UML design suite (Use Case, Domain, Class, Sequence, State, Activity, Component, Deployment)  
+- Cloud deployment architecture modeled on Microsoft Azure  
+- Database schema and skeleton class definitions  
+- API specifications (OpenAPI)  
+- Architecture Decision Records (ADRs)  
+- STRIDE threat model and infrastructure view  
+- Service decomposition documentation  
+- Presentation and navigation materials for the final project  
 
+---
 
-The system enhances traditional LMS platforms by integrating AI-generated practice sessions tailored to each student based on their performance in assessments and completed course materials.
+## Repository Structure
+sdd/ → Software Design Documents (01–05 Views)
+assets/diagrams/ → UML diagrams (PNG + PlantUML)
+specs/ → API specification (openapi.yaml) and DB schema (schema.sql)
+decisions/ → Architecture Decision Records (ADR-001 to ADR-003)
+services/ → Service boundaries (Web App, API Service, AI Service)
+README.md → Project overview and navigation
 
 
+Each folder aligns with the structure required by the Final Project Submission Guide.
 
-The project includes:
+---
 
+## UML Diagrams
 
+All PNG diagram images are located in: assets/diagrams/png/ and PlantUML source files are in: assets/diagrams/plantuml/
 
-Business requirements \& non-functional requirements
 
+### Diagram List
 
+- **Use Case Diagram.png**
+- **domain MODEL.png**  
+- **domain class diagram.png**
+- **Sequence Diagram #1 – Request Adaptive Practice Session (Synchronous).png**
+- **Sequence Diagram #2 – Complete AI-Generated Practice Quiz.png**
+- **Practice Session State Diagram.png**
+- **activity diagram.png**
+- **component diagram.png**
+- **deployment diagram.png**
 
-Full UML diagram suite
+These diagrams are referenced throughout the SDD files.
 
+---
 
+## PlantUML Source Files
 
-Cloud deployment architecture (Azure)
+All corresponding `.puml` files for the diagrams are included under: assets/diagrams/plantuml/
 
 
+These files allow instructors, graders, or future developers to regenerate or modify the diagrams.
 
-Database schema \& skeleton class definitions
+---
 
+## Specifications (API + Database)
 
+The `specs/` folder includes:
 
-Design pattern application (GRASP, SOLID, GoF, layered architecture)
+- **openapi.yaml** — REST API specification for adaptive practice endpoints  
+- **schema.sql** — Database schema (DDL) supporting courses, users, practice sessions, mastery tracking, and LMS data structures  
 
+These specifications align with the data design in `03-data-design.md` and the service architecture documented in `services/`.
 
+---
 
-Supporting presentation materials
+## Architecture Decision Records (ADRs)
 
+The `decisions/` folder captures major architectural decisions, including:
 
+- **ADR-001:** Selection of Microsoft Azure as the cloud platform  
+- **ADR-002:** Decision to use AI-generated adaptive practice instead of adaptive difficulty  
+- **ADR-003:** Adoption of a layered architecture for maintainability and separation of concerns  
 
-### Repository Structure
+These ADRs help document the rationale behind the project's architectural direction.
 
-sdd/                → Software Design Documents (Markdown)
+---
 
-assets/diagrams/    → UML diagrams (PlantUML + PNG exports)
+## Services
 
-specs/              → API and database specifications (to be added)
+The `services/` folder contains design documentation (not executable code) for the three main service boundaries:
 
-decisions/          → Architecture Decision Records (to be added)
+- **web-app/** – User interface layer, Azure AD login, front-end rendering  
+- **api-service/** – Core backend logic, orchestration, secure access enforcement  
+- **ai-service/** – Adaptive learning engine interfacing with Azure OpenAI  
 
-services/           → Service stubs / structure (to be added)
+This structure reflects the service decomposition illustrated in the Component and Deployment diagrams.
 
-README.md           → Project overview
+---
 
-### UML Diagrams (PNG Images)
+## Cloud Deployment
 
+The system is designed for deployment on **Microsoft Azure**, including:
 
+- Azure App Service (Web App + API)  
+- Azure SQL Database (LMS DB + Analytics DB)  
+- Azure Storage Account (content, logs, media)  
+- Azure OpenAI Service (adaptive practice generation)  
+- Azure Active Directory / Entra ID (authentication & RBAC)  
+- Azure Communication Services (notifications)  
 
-All diagrams are located in the /diagrams folder:
+This architecture supports high scalability (10,000+ concurrent users), secure access control, and strong performance SLAs.
 
+---
 
+## Security & Threat Modeling
 
-Figure 1 – Use Case Diagram
+A full STRIDE threat model is included in: sdd/05-infrastructure.md
 
 
+It covers Spoofing, Tampering, Repudiation, Information Disclosure, Denial of Service, and Elevation of Privilege across the Web App, API, AI integration, and Azure infrastructure.
 
-Figure 2 – Domain Model
+---
 
-
-
-Figure 3 – Class Diagram
-
-
-
-Figure 4 – Sequence Diagram: Request Practice Session
-
-
-
-Figure 5 – Sequence Diagram: Submit Answer
-
-
-
-Figure 6 – State Diagram: PracticeSession Lifecycle
-
-
-
-Figure 7 – Activity Diagram (Swimlane)
-
-
-
-Figure 8 – Component Diagram
-
-
-
-Figure 9 – Azure Deployment Diagram
-
-
-
-### PlantUML Source Files
-
-
-
-All .puml files corresponding to the diagrams are included in /plantuml, enabling regeneration or modification.
-
-
-
-### Cloud Deployment
-
-
-
-The system is deployed on Microsoft Azure using:
-
-
-
-Azure App Service
-
-
-
-Azure SQL Databases
-
-
-
-Azure Storage Account
-
-
-
-Azure OpenAI Service
-
-
-
-Azure Active Directory (Entra ID)
-
-
-
-Azure Communication Services
-
-
-
-This design supports scalability, AI integration, and enterprise-grade security.
-
-
-
-### Design Patterns Implemented
-
-
+## Design Patterns Implemented
 
 The system incorporates:
 
+- **GRASP:** Controller, Information Expert, Low Coupling, Creator  
+- **SOLID:** SRP, OCP, LSP, ISP, DIP  
+- **GoF:** Facade, Strategy, Repository-style access  
+- **Architectural Patterns:** Layered architecture, service decomposition  
 
+Patterns are explicitly tied to UML artifacts in the SDD.
 
-GRASP: Controller, Information Expert, Low Coupling, Creator
+---
 
+## Video Presentation
 
-
-SOLID: SRP, OCP, LSP, ISP, DIP
-
-
-
-GoF: Facade, Strategy, Repository-style access
-
-
-
-Architectural Patterns: Layered architecture, service decomposition
+A link to the required 8–16 minute project video will be added here:
 
 
 
-Each pattern is tied to specific UML diagrams for clarity and justification.
-
-
-
-### Author
-
-
-
-Charles L White Jr
-
-SWENG 837 – Software System Design
-
-Pennsylvania State University
 
