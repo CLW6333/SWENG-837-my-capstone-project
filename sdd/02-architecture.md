@@ -1,11 +1,3 @@
-USE Case Diagram
- 
-Figure 1: Use Case Diagram – Online Learning Platform with Adaptive Practice (Use Case Diagram.png)
-Figure 1 Description
-Figure 1 displays all the major actors in the system with functional interactions for each. The three primary actors that interact with the system are: Students, Instructors, and Administrators. Students can access course content, view grades and instructor feedback, and take assessments. If needed they can request adaptive practice sessions to then take ai generated practice content. Instructors manage course content and assessments while viewing student performance and struggle areas. They are also able to use analytics to review adaptive practice information. Administrators on the other hand manage users and assign roles that determine what content they can view. They are able to edit and create new courses in the catalog while adding or removing content for those courses. System wide settings for the adaptive Practice AI system are configured by the Administrators.
-
-An external AI practice service generates personalized practice questions with related explanations based on the student performance data. The students can view these explanations while taking practice quizzes and tests. As the generated practice material is made separately from the main course content this ensures the adaptive practice results do not alter the students grades. The Take AI generated material use case includes a dependency on Generate practice questions and explanations indicating dynamically created content rather than pre made ones. Having view explanations as a necessary next step after taking practice assessments reinforces learning by seeing the explanations for incorrect responses.
-
 Domain Model
  
 Figure 2: Domain Model (Domain model.png)
