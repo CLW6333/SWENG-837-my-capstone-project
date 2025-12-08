@@ -137,7 +137,8 @@ Patterns are explicitly tied to UML artifacts in the SDD.
 
 ## Video Presentation
 
-A link to the required 8–16 minute project video will be added here:
+[Youtube](https://youtu.be/WfLOtOubr5Y)
+
 
 
 
